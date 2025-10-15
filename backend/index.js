@@ -8,15 +8,23 @@ const transcribeRoutes = require('./routes/transcribe');
 const authRoutes = require('./routes/auth');
 
 const app = express();
+
+// Use Render's port or default to 5000 for local development
 const port = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors());
+// Enhanced CORS for production
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'https://your-app-name.netlify.app' // You'll update this after frontend deploy
+  ],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // MongoDB connection with better timeout handling
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/audio-transcriber";
-let isMongoConnected = false;
 
 console.log('🔗 Attempting MongoDB connection...');
 
@@ -26,12 +34,10 @@ mongoose.connect(MONGODB_URI, {
 })
 .then(() => {
   console.log("✅ Connected to MongoDB successfully!");
-  isMongoConnected = true;
 })
 .catch(err => {
   console.log("❌ MongoDB connection failed:", err.message);
   console.log("💡 Using mock database instead");
-  isMongoConnected = false;
 });
 
 // Routes
@@ -41,8 +47,8 @@ app.use('/api/auth', authRoutes);
 // Basic test route
 app.get('/', (req, res) => {
   res.json({ 
-    message: 'Hello from Express backend!',
-    database: isMongoConnected ? 'Connected' : 'Mock Mode',
+    message: 'Audio Transcriber Backend is running!',
+    status: 'OK',
     timestamp: new Date().toISOString()
   });
 });
@@ -52,7 +58,6 @@ app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     message: 'Backend server is running',
-    database: isMongoConnected ? 'Connected' : 'Mock Mode',
     timestamp: new Date().toISOString()
   });
 });
@@ -60,7 +65,6 @@ app.get('/api/health', (req, res) => {
 // Get transcription history
 app.get('/api/transcriptions', async (req, res) => {
   try {
-    // This will use the mock storage from transcribe.js
     const response = await fetch(`http://localhost:${port}/api/transcribe/history`);
     const data = await response.json();
     res.json(data);
@@ -70,12 +74,11 @@ app.get('/api/transcriptions', async (req, res) => {
       success: false, 
       error: 'Failed to fetch transcriptions',
       transcriptions: [] 
-    });
-  }
+    });
+  }
 });
 
 // Start the server
-app.listen(port, () => {
-  console.log(`🚀 Server is running on port: ${port}`);
-  console.log(`📊 Database: ${isMongoConnected ? 'Connected' : 'Mock Mode'}`);
+app.listen(port, '0.0.0.0', () => {
+  console.log(`🚀 Server is running on port: ${port}`);
 });
