@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: audio-transcriber-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        fromDatabase:
+          name: audio-transcriber-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ASSEMBLYAI_API_KEY
+        value: your_assemblyai_api_key_here
