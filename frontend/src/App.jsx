@@ -4,6 +4,7 @@ import Register from './components/Auth/Register.jsx'
 import HistoryList from './components/History/HistoryList.jsx'
 
 function App() {
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
   const [currentView, setCurrentView] = useState('login')
   const [user, setUser] = useState(null)
   const [transcription, setTranscription] = useState('')
@@ -34,7 +35,7 @@ function App() {
   const fetchTranscriptionHistory = async () => {
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch('http://localhost:5000/api/transcriptions', {
+      const response = await fetch(`${API_URL}/api/transcriptions`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -111,7 +112,7 @@ function App() {
       formData.append('audio', file)
 
       const token = localStorage.getItem('token')
-      const response = await fetch('http://localhost:5000/api/transcribe', {
+      const response = await fetch(`${API_URL}/api/transcribe`, {
         method: 'POST',
         body: formData,
         headers: token ? { 'Authorization': `Bearer ${token} `} : {}
@@ -197,7 +198,7 @@ const handleClearHistory = async () => {
       
       // Try to clear backend history
       if (token) {
-        await fetch('http://localhost:5000/api/transcribe/history', {
+        await fetch(`${API_URL}/api/transcribe/history`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`
