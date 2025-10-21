@@ -16,7 +16,7 @@ const port = process.env.PORT || 5000;
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    'https://your-app-name.netlify.app' // You'll update this after frontend deploy
+    'https://teal-lolly-371105.netlify.app/' // You'll update this after frontend deploy
   ],
   credentials: true
 }));
