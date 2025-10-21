@@ -14,10 +14,7 @@ const port = process.env.PORT || 5000;
 
 // Enhanced CORS for production
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'https://teal-lolly-371105.netlify.app/' // You'll update this after frontend deploy
-  ],
+  origin: "*",
   credentials: true
 }));
 
